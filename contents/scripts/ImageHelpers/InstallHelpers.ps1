@@ -176,7 +176,7 @@ function Start-DownloadWithRetry
         try
         {
             Write-Host "Downloading package from: $Url to path $filePath ."
-            Invoke-WebRequest -Proxy $env:HTTP_PROXY -Uri $Url -UseBasicParsing -OutFile $filePath
+            Invoke-WebRequest -Uri $Url -UseBasicParsing -OutFile $filePath
             # (New-Object System.Net.WebClient).DownloadFile($Url, $filePath)
             break
         }
@@ -207,7 +207,7 @@ function Get-VsixExtenstionFromMarketplace {
     )
 
     $extensionUri = $MarketplaceUri + $ExtensionMarketPlaceName
-    $request = Invoke-WebRequest -Proxy $env:HTTP_PROXY -Uri $extensionUri -UseBasicParsing
+    $request = Invoke-WebRequest -Uri $extensionUri -UseBasicParsing
     $request -match 'UniqueIdentifierValue":"(?<extensionname>[^"]*)' | Out-Null
     $extensionName = $Matches.extensionname
     $request -match 'VsixId":"(?<vsixid>[^"]*)' | Out-Null
@@ -478,7 +478,7 @@ function Invoke-RestMethodAuth {
         $base64 = [System.Convert]::ToBase64String( [char[]]$Token)
         $header = @{ Authorization = "Basic $base64"}
 
-        return Invoke-RestMethod -Proxy $env:HTTP_PROXY -UseBasicParsing -Headers $header -OutFile $OutFile -Uri $Uri
+        return Invoke-RestMethod -UseBasicParsing -Headers $header -OutFile $OutFile -Uri $Uri
     }
-    return Invoke-RestMethod -Proxy $env:HTTP_PROXY -UseBasicParsing -OutFile $OutFile -Uri $Uri
+    return Invoke-RestMethod -UseBasicParsing -OutFile $OutFile -Uri $Uri
 }

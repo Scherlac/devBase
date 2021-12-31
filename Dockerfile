@@ -3,8 +3,8 @@
 ARG GIT_TOKEN
 # ARG HTTP_PROXY
 # ARG HTTPS_PROXY
-
-FROM mcr.microsoft.com/windows/servercore:10.0.19042.1415 AS layer1
+FROM mcr.microsoft.com/windows/servercore:win10-21h1-preview AS layer1
+#FROM mcr.microsoft.com/windows/servercore:10.0.19042.1415 AS layer1
 
 # ENV NO_PROXY="localhost,127.0.0.1"
 
@@ -50,7 +50,10 @@ RUN Import-Module .\ImageHelpers\ImageHelpers.psm1 -Force; `
 
 FROM localhost:5000/windows-servercore-devbase:layer2 AS layer3
 
-
+ARG artifactoryNPMVirtualUrl="https://registry.npmjs.org/"
+ARG npmEmail
+ARG npmApiKey
+ 
 ENV TOOLSET_JSON_PATH="C:\image\toolsets\toolset-2019.json"
 
 # COPY Install-NodeLts.ps1 ./Installers/Install-NodeLts.ps1

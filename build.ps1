@@ -1,9 +1,8 @@
 
 Param(
-    [string]$gitToken,
-    [string]$httpProxy,
+    [string] $gitToken,
     [string] $npmEmail = ${env:npmEmail},
-    [string] $npmApiKey = ${env:npmApiKey}
+    [string] $npmApiKey = ${env:npmApiKey}     
     )
 
 $startLocation = Get-Location 
@@ -19,28 +18,30 @@ Write-Output "Building the image for repository ${dockerRepository} with tag ${d
     $layer = $_;
 
     docker build `
-    -t "${dockerRegistry}/${dockerOrganization}/${dockerRepository}:${layer}" `
+    -t "${dockerRegistry}${dockerRepository}:${layer}" `
     --target "${layer}" `
+    --isolation="hyperv" `
     --build-arg GIT_TOKEN=$gitToken `
-    --build-arg HTTP_PROXY=$httpProxy `
-    --build-arg HTTPS_PROXY=$httpProxy `
-    --build-arg npmEmail=$npmEmail `
-    --build-arg npmApiKey=$npmApiKey `
     -f $dockerPath $workSpace/contents
 
-    docker push "${dockerRegistry}/${dockerOrganization}/${dockerRepository}:${layer}"
+    # docker push "${dockerRegistry}/${dockerRepository}:${layer}"
 
 }
 
 docker build `
-    -t "${dockerRegistry}/${dockerOrganization}/${dockerRepository}:${dockerVersionTag}" `
-    -t "${dockerRegistry}/${dockerOrganization}/${dockerRepository}:${dockerVersionTagLatest}" `
+    -t "${dockerRegistry}${dockerRepository}:${dockerVersionTag}" `
+    -t "${dockerRegistry}${dockerRepository}:${dockerVersionTagLatest}" `
+    --isolation="hyperv" `
     --build-arg GIT_TOKEN=$gitToken `
-    --build-arg HTTP_PROXY=$httpProxy `
-    --build-arg HTTPS_PROXY=$httpProxy `
-    --build-arg npmEmail=$npmEmail `
-    --build-arg npmApiKey=$npmApiKey `
     -f $dockerPath $workSpace/contents
+
+# docker push "${dockerRegistry}/${dockerRepository}:${dockerVersionTag}"
+# docker push "${dockerRegistry}/${dockerRepository}:${dockerVersionTagLatest}"
+
+# https://download.microsoft.com/download/E/E/D/EEDF18A8-4AED-4CE0-BEBE-70A83094FC5A/BuildTools_Full.exe
+# Invoke-WebRequest https://download.microsoft.com/download/E/E/D/EEDF18A8-4AED-4CE0-BEBE-70A83094FC5A/BuildTools_Full.exe -OutFile BuildTools_Full.exe
+# .\BuildTools_Full.exe --allWorkloads --includeRecommended --quiet --norestart --wait --nocache
+# .\BuildTools_Full.exe /quiet /norestart /wait /nocache /log "C:\image\BuildTools2015-Install.log"
 
 # revert location to origin 
 Set-Location $startLocation

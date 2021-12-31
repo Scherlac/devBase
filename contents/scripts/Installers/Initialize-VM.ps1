@@ -119,7 +119,7 @@ else {
 
 # Run the installer
 Invoke-RestMethodAuth -Uri https://chocolatey.org/install.ps1 -OutFile .\Installers\Install-Chocolatey.ps1
-.\Installers\Install-Chocolatey.ps1 -ProxyUrl $env:HTTP_PROXY 
+.\Installers\Install-Chocolatey.ps1
 # Turn off confirmation
 choco feature enable -n allowGlobalConfirmation
 

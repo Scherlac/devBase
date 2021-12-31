@@ -309,7 +309,7 @@ try {
         }
 
         try {
-            Invoke-WebRequest -Proxy $env:HTTP_PROXY -Uri $downloadURL -OutFile $packagePath
+            Invoke-WebRequest -Uri $downloadURL -OutFile $packagePath
         } finally {
             if (!$PSVersionTable.ContainsKey('PSEdition') -or $PSVersionTable.PSEdition -eq "Desktop") {
                 $ProgressPreference = $oldProgressPreference
@@ -377,7 +377,7 @@ try {
         }
 
         try {
-            Invoke-WebRequest -Proxy $env:HTTP_PROXY -Uri $downloadURL -OutFile $packagePath
+            Invoke-WebRequest -Uri $downloadURL -OutFile $packagePath
         } finally {
             if (!$PSVersionTable.ContainsKey('PSEdition') -or $PSVersionTable.PSEdition -eq "Desktop") {
                 $ProgressPreference = $oldProgressPreference
