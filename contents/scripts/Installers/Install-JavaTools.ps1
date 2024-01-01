@@ -1,6 +1,7 @@
 ################################################################################
 ##  File:  Install-JavaTools.ps1
 ##  Desc:  Install various JDKs and java tools
+##  Supply chain security: JDK - checksum validation
 ################################################################################
 
 function Set-JavaPath {
@@ -10,7 +11,7 @@ function Set-JavaPath {
         [switch] $Default
     )
 
-    $javaPathPattern = Join-Path -Path $env:AGENT_TOOLSDIRECTORY -ChildPath "Java_Adopt_jdk/${Version}*/${Architecture}"
+    $javaPathPattern = Join-Path -Path $env:AGENT_TOOLSDIRECTORY -ChildPath "Java_Temurin-Hotspot_jdk/${Version}*/${Architecture}"
     $javaPath = (Get-Item -Path $javaPathPattern).FullName
 
     if ([string]::IsNullOrEmpty($javaPath)) {
@@ -19,19 +20,17 @@ function Set-JavaPath {
     }
 
     Write-Host "Set 'JAVA_HOME_${Version}_X64' environmental variable as $javaPath"
-    setx JAVA_HOME_${Version}_X64 $javaPath /M
+    [Environment]::SetEnvironmentVariable("JAVA_HOME_${Version}_X64", $javaPath, "Machine")
 
-    if ($Default)
-    {
-        $currentPath = Get-MachinePath
+    if ($Default) {
+        # Clean up any other Java folders from PATH to make sure that they won't conflict with each other
+        $currentPath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
 
         $pathSegments = $currentPath.Split(';')
         $newPathSegments = @()
 
-        foreach ($pathSegment in $pathSegments)
-        {
-            if ($pathSegment -notlike '*java*')
-            {
+        foreach ($pathSegment in $pathSegments) {
+            if ($pathSegment -notlike '*java*') {
                 $newPathSegments += $pathSegment
             }
         }
@@ -40,93 +39,103 @@ function Set-JavaPath {
         $newPath = $javaPath + '\bin;' + $newPath
 
         Write-Host "Add $javaPath\bin to PATH"
-        Set-MachinePath -NewPath $newPath
+        [Environment]::SetEnvironmentVariable("PATH", $newPath, "Machine")
 
         Write-Host "Set JAVA_HOME environmental variable as $javaPath"
-        setx JAVA_HOME $javaPath /M
+        [Environment]::SetEnvironmentVariable("JAVA_HOME", $javaPath, "Machine")
     }
 }
 
-function Install-JavaFromAdoptOpenJDK {
+function Install-JavaJDK {
     param(
         [string] $JDKVersion,
         [string] $Architecture = "x64"
     )
 
-    # Get Java version from adopt openjdk api
-    $assetUrl = Invoke-RestMethodAuth -Uri "https://api.adoptopenjdk.net/v3/assets/latest/${JDKVersion}/hotspot"
+    # Get Java version from api
+    $assetUrl = Invoke-RestMethod -Uri "https://api.adoptium.net/v3/assets/latest/${JDKVersion}/hotspot"
+
     $asset = $assetUrl | Where-Object {
         $_.binary.os -eq "windows" `
-        -and $_.binary.architecture -eq $Architecture `
-        -and $_.binary.image_type -eq "jdk"
+            -and $_.binary.architecture -eq $Architecture `
+            -and $_.binary.image_type -eq "jdk"
     }
 
     # Download and extract java binaries to temporary folder
     $downloadUrl = $asset.binary.package.link
-    $archivePath = Start-DownloadWithRetry -Url $downloadUrl -Name $([IO.Path]::GetFileName($downloadUrl))
+    $archivePath = Invoke-DownloadWithRetry $downloadUrl
+    Test-FileChecksum $archivePath -ExpectedSHA256Sum $asset.binary.package.checksum
 
-    # We have to replace '+' sign in the version to '-' due to the issue with incorrect path in Android builds https://github.com/actions/virtual-environments/issues/3014
+    # We have to replace '+' sign in the version to '-' due to the issue with incorrect path in Android builds https://github.com/actions/runner-images/issues/3014
     $fullJavaVersion = $asset.version.semver -replace '\+', '-'
+    # Remove 'LTS' suffix from the version if present
+    $fullJavaVersion = $fullJavaVersion -replace '\.LTS$', ''
     # Create directories in toolcache path
-    $javaToolcachePath = Join-Path -Path $env:AGENT_TOOLSDIRECTORY -ChildPath "Java_Adopt_jdk"
+    $javaToolcachePath = Join-Path -Path $env:AGENT_TOOLSDIRECTORY -ChildPath "Java_Temurin-Hotspot_jdk"
     $javaVersionPath = Join-Path -Path $javaToolcachePath -ChildPath $fullJavaVersion
     $javaArchPath = Join-Path -Path $javaVersionPath -ChildPath $Architecture
 
-    if (-not (Test-Path $javaToolcachePath))
-    {
-        Write-Host "Creating Adopt openjdk toolcache folder"
+    if (-not (Test-Path $javaToolcachePath)) {
+        Write-Host "Creating Temurin-Hotspot toolcache folder"
         New-Item -ItemType Directory -Path $javaToolcachePath | Out-Null
     }
 
     Write-Host "Creating Java '${fullJavaVersion}' folder in '${javaVersionPath}'"
     New-Item -ItemType Directory -Path $javaVersionPath -Force | Out-Null
 
-    # Complete the installation by extarcting Java binaries to toolcache and creating the complete file
-    Extract-7Zip -Path $archivePath -DestinationPath $javaVersionPath
-    Get-ChildItem -Path $javaVersionPath | Rename-Item -NewName $javaArchPath
+    # Complete the installation by extracting Java binaries to toolcache and creating the complete file
+    Expand-7ZipArchive -Path $archivePath -DestinationPath $javaVersionPath
+    Invoke-ScriptBlockWithRetry -Command {
+        Get-ChildItem -Path $javaVersionPath | Rename-Item -NewName $javaArchPath -ErrorAction Stop
+    }
     New-Item -ItemType File -Path $javaVersionPath -Name "$Architecture.complete" | Out-Null
 }
 
-$jdkVersions = (Get-ToolsetContent).java.versions
-$defaultVersion = (Get-ToolsetContent).java.default
+$toolsetJava = (Get-ToolsetContent).java
+$defaultVersion = $toolsetJava.default
+$jdkVersionsToInstall = $toolsetJava.versions
 
-foreach ($jdkVersion in $jdkVersions) {
-    Install-JavaFromAdoptOpenJDK -JDKVersion $jdkVersion
+foreach ($jdkVersionToInstall in $jdkVersionsToInstall) {
+    $isDefaultVersion = $jdkVersionToInstall -eq $defaultVersion
 
-    if ($jdkVersion -eq $defaultVersion) {
-        Set-JavaPath -Version $jdkVersion -Default
+    Install-JavaJDK -JDKVersion $jdkVersionToInstall
+
+    if ($isDefaultVersion) {
+        Set-JavaPath -Version $jdkVersionToInstall -Default
     } else {
-        Set-JavaPath -Version $jdkVersion
+        Set-JavaPath -Version $jdkVersionToInstall
     }
 }
 
 # Install Java tools
 # Force chocolatey to ignore dependencies on Ant and Maven or else they will download the Oracle JDK
-Choco-Install -PackageName ant -ArgumentList "-i"
-Choco-Install -PackageName maven -ArgumentList "-i", "--version=3.8.1"
-Choco-Install -PackageName gradle
+Install-ChocoPackage ant -ArgumentList "--ignore-dependencies"
+# Maven 3.9.x has multiple compatibilities problems
+$toolsetMavenVersion = (Get-ToolsetContent).maven.version
+$versionToInstall = Resolve-ChocoPackageVersion -PackageName "maven" -TargetVersion $toolsetMavenVersion
 
-# Move maven variables to Machine. They may not be in the environment for this script so we need to read them from the registry.
-$userEnvironmentKey = 'Registry::HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment'
+Install-ChocoPackage maven -ArgumentList "--version=$versionToInstall"
+Install-ChocoPackage gradle
 
-$m2_home = (Get-ItemProperty -Path $userEnvironmentKey -Name M2_HOME).M2_HOME
-$m2 = $m2_home + '\bin'
-$maven_opts = '-Xms256m'
+# Add maven env variables to Machine
+[string] $m2Path = ([Environment]::GetEnvironmentVariable("PATH", "Machine")).Split(";") -match "maven"
 
-$m2_repo = 'C:\ProgramData\m2'
-New-Item -Path $m2_repo -ItemType Directory -Force
+$m2RepoPath = 'C:\ProgramData\m2'
+New-Item -Path $m2RepoPath -ItemType Directory -Force | Out-Null
 
-setx M2 $m2 /M
-setx M2_REPO $m2_repo /M
-setx MAVEN_OPTS $maven_opts /M
+[Environment]::SetEnvironmentVariable("M2", $m2Path, "Machine")
+[Environment]::SetEnvironmentVariable("M2_REPO", $m2RepoPath, "Machine")
+[Environment]::SetEnvironmentVariable("MAVEN_OPTS", "-Xms256m", "Machine")
 
 # Download cobertura jars
-$uri = 'https://downloads.sourceforge.net/project/cobertura/cobertura/2.1.1/cobertura-2.1.1-bin.zip'
+$uri = 'https://repo1.maven.org/maven2/net/sourceforge/cobertura/cobertura/2.1.1/cobertura-2.1.1-bin.zip'
+$sha256sum = '79479DDE416B082F38ECD1F2F7C6DEBD4D0C2249AF80FD046D1CE05D628F2EC6'
 $coberturaPath = "C:\cobertura-2.1.1"
 
-$archivePath = Start-DownloadWithRetry -Url $uri -Name "cobertura.zip"
-Extract-7Zip -Path $archivePath -DestinationPath "C:\"
+$archivePath = Invoke-DownloadWithRetry $uri
+Test-FileChecksum $archivePath -ExpectedSHA256Sum $sha256sum
+Expand-7ZipArchive -Path $archivePath -DestinationPath "C:\"
 
-setx COBERTURA_HOME $coberturaPath /M
+[Environment]::SetEnvironmentVariable("COBERTURA_HOME", $coberturaPath, "Machine")
 
 Invoke-PesterTests -TestFile "Java"

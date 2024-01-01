@@ -24,7 +24,7 @@ Describe "AWS" {
     }
 
     It "Session Manager Plugin for the AWS CLI" {
-        session-manager-plugin | Out-String | Should -Match "plugin was installed successfully"
+        @(session-manager-plugin) -Match '\S' | Out-String | Should -Match "plugin was installed successfully"
     }
 
     It "AWS SAM CLI" {
@@ -39,18 +39,12 @@ Describe "GitHub CLI" {
     }
 }
 
-Describe "CloudFoundry CLI" {
+Describe "CloudFoundry CLI" -Skip:(Test-IsWin22) {
     It "cf is located in C:\cf-cli" {
         "C:\cf-cli\cf.exe" | Should -Exist
     }
 
     It "cf" {
         "cf --version" | Should -ReturnZeroExitCode
-    }
-}
-
-Describe "Hub CLI" {
-    It "hub is installed" {
-        "hub --version" | Should -ReturnZeroExitCode
     }
 }

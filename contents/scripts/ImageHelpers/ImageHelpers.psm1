@@ -1,45 +1,56 @@
 [CmdletBinding()]
 param()
 
-. $PSScriptRoot\PathHelpers.ps1
-. $PSScriptRoot\InstallHelpers.ps1
-. $PSScriptRoot\ChocoHelpers.ps1
-. $PSScriptRoot\TestsHelpers.ps1
-. $PSScriptRoot\VisualStudioHelpers.ps1
-
+. $PSScriptRoot\AndroidHelpers.ps1
 Export-ModuleMember -Function @(
-    'Test-MachinePath'
-    'Get-MachinePath'
-    'Set-MachinePath'
-    'Add-MachinePathItem'
-    'Get-SystemVariable'
-    'Set-SystemVariable'
-    'Install-Binary'
-    'Install-VisualStudio'
-    'Get-ToolsetContent'
-    'Get-ToolsetToolFullPath'
-    'Stop-SvcWithErrHandling'
-    'Set-SvcWithErrHandling'
-    'Start-DownloadWithRetry'
-    'Get-VsixExtenstionFromMarketplace'
-    'Install-VsixExtension'
-    'Get-VSExtensionVersion'
-    'Get-WinVersion'
-    'Test-IsWin19'
-    'Test-IsWin16'
-    'Choco-Install'
-    'Extract-7Zip'
-    'Get-CommandResult'
-    'Get-WhichTool'
-    'Get-EnvironmentVariable'
-    'Invoke-PesterTests'
-    'Get-VsCatalogJsonPath'
-    'Get-VisualStudioPath'
-    'Install-AndroidSDKPackages'
     'Get-AndroidPackages'
-    'Get-AndroidPackagesByName'
-    'Get-AndroidPackagesByVersion'
-    'Get-VisualStudioPackages'
+    'Get-AndroidPlatformPackages'
+    'Get-AndroidBuildToolPackages'
+    'Get-AndroidInstalledPackages'
+)
+
+. $PSScriptRoot\ChocoHelpers.ps1
+Export-ModuleMember -Function @(
+    'Install-ChocoPackage'
+    'Resolve-ChocoPackageVersion'
+)
+
+. $PSScriptRoot\InstallHelpers.ps1
+Export-ModuleMember -Function @(
+    'Install-Binary'
+    'Invoke-DownloadWithRetry'
+    'Get-ToolsetContent'
+    'Get-TCToolPath'
+    'Get-TCToolVersionPath'
+    'Test-IsWin22'
+    'Test-IsWin19'
+    'Expand-7ZipArchive'
+    'Get-WindowsUpdateStates'
+    'Invoke-ScriptBlockWithRetry'
+    'Get-GithubReleasesByVersion'
+    'Resolve-GithubReleaseAssetUrl'
+    'Get-ChecksumFromGithubRelease'
+    'Get-ChecksumFromUrl'
+    'Test-FileChecksum'
+    'Test-FileSignature'
+    'Update-Environment'
+)
+
+. $PSScriptRoot\PathHelpers.ps1
+Export-ModuleMember -Function @(
+    'Mount-RegistryHive'
+    'Dismount-RegistryHive'
+    'Add-MachinePathItem'
+    'Add-DefaultPathItem'
+)
+
+. $PSScriptRoot\VisualStudioHelpers.ps1
+Export-ModuleMember -Function @(
+    'Install-VisualStudio'
+    'Get-VisualStudioInstance'
     'Get-VisualStudioComponents'
-    'Invoke-RestMethodAuth'
+    'Get-VsixInfoFromMarketplace'
+    'Install-VSIXFromFile'
+    'Install-VSIXFromUrl'
+    'Get-VSExtensionVersion'
 )

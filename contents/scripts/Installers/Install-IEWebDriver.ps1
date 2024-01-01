@@ -1,40 +1,30 @@
 ################################################################################
-##  File:  Install-SeleniumWebDrivers.ps1
-##  Desc:  Install Selenium Web Drivers
+##  File:  Install-IEWebDriver.ps1
+##  Desc:  Install IE Web Driver
 ################################################################################
 
-try {
-    $latestReleaseUrl = "https://selenium-release.storage.googleapis.com/"
-    $latestReleaseInfo = Invoke-RestMethodAuth -Uri $latestReleaseUrl
-    $latestIEVersion = $latestReleaseInfo.ListBucketResult.Contents | Where-Object Key -match "IEDriverServer_x64" | Sort-Object LastModified | Select-Object -ExpandProperty Key -Last 1
-    $ieDriverUrl = -join ($latestReleaseUrl, $latestIEVersion)
-} catch {
-    Write-Error "[!] Failed to get IEDriver version [$latestReleaseUrl]: $_"
-    exit 1
-}
+$seleniumMajorVersion = (Get-ToolsetContent).selenium.version
+$ieDriverUrl = Resolve-GithubReleaseAssetUrl `
+    -Repo "SeleniumHQ/selenium" `
+    -Version "$seleniumMajorVersion.*" `
+    -Asset "IEDriverServer_x64_*.zip"
 
 # Download IE selenium driver
-try {
-    Write-Host "Selenium IEDriverServer download and install..."
-    $driverZipFile = Start-DownloadWithRetry -Url $ieDriverUrl -Name "SeleniumWebDrivers.zip"
-}
-catch {
-    Write-Error "[!] Failed to download $ieDriverUrl"
-    exit 1
-}
+Write-Host "Selenium IEDriverServer download and install..."
+$driverZipFile = Invoke-DownloadWithRetry $ieDriverUrl
 
 $ieDriverPath = "C:\SeleniumWebDrivers\IEDriver"
 if (-not (Test-Path -Path $ieDriverPath)) {
-    $null = New-Item -Path $ieDriverPath -ItemType Directory -Force
+    New-Item -Path $ieDriverPath -ItemType Directory -Force | Out-Null
 }
 
-Extract-7Zip -Path $driverZipFile -DestinationPath $ieDriverPath
+Expand-7ZipArchive -Path $driverZipFile -DestinationPath $ieDriverPath
 Remove-Item $driverZipFile
 
 Write-Host "Get the IEDriver version..."
 (Get-Item "$ieDriverPath\IEDriverServer.exe").VersionInfo.FileVersion | Out-File -FilePath "$ieDriverPath\versioninfo.txt"
 
 Write-Host "Setting the IEWebDriver environment variables"
-setx IEWebDriver $ieDriverPath /M
+[Environment]::SetEnvironmentVariable("IEWebDriver", $ieDriverPath, "Machine")
 
 Invoke-PesterTests -TestFile "Browsers" -TestName "Internet Explorer"

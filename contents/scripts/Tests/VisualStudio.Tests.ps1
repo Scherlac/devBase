@@ -1,7 +1,8 @@
 Describe "Visual Studio" {
     Context "Basic" {
         It "Catalog.json" {
-            Get-VsCatalogJsonPath | Should -Exist
+            $instanceFolder = Get-Item "C:\ProgramData\Microsoft\VisualStudio\Packages\_Instances\*" | Select-Object -First 1
+            Join-Path $instanceFolder.FullName "catalog.json" | Should -Exist
         }
 
         # REMOVED:
@@ -22,5 +23,17 @@ Describe "Visual Studio" {
         It "<ComponentName>" -TestCases $testCases {
             $installedComponents | Should -Contain $ComponentName
         }
+    }
+}
+
+Describe "Windows 10 SDK" {
+    It "Verifies 17763 SDK is installed" -Skip:(Test-IsWin19) {
+        "${env:ProgramFiles(x86)}\Windows Kits\10\DesignTime\CommonConfiguration\Neutral\UAP\10.0.17763.0\UAP.props" | Should -Exist
+    }
+}
+
+Describe "Windows 11 SDK" {
+    It "Verifies 22621 SDK is installed" -Skip:(Test-IsWin22) {
+        "${env:ProgramFiles(x86)}\Windows Kits\10\DesignTime\CommonConfiguration\Neutral\UAP\10.0.22621.0\UAP.props" | Should -Exist
     }
 }

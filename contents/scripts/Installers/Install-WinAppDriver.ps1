@@ -3,11 +3,14 @@
 ##  Desc:  Install Windows Application Driver (WinAppDriver)
 ####################################################################################
 
-$LatestReleaseUrl = 'https://api.github.com/repos/microsoft/WinAppDriver/releases/latest'
-$InstallerUrl = (Invoke-RestMethodAuth -Uri $LatestReleaseUrl).assets.browser_download_url
-$InstallerName = "WindowsApplicationDriver.msi"
-
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Install-Binary -Url $InstallerUrl -Name $InstallerName
+$downloadUrl = Resolve-GithubReleaseAssetUrl `
+    -Repo "microsoft/WinAppDriver" `
+    -Version "latest" `
+    -UrlMatchPattern "WindowsApplicationDriver_*.msi"
 
-Invoke-PesterTests -TestFile "WinAppDriver"
+Install-Binary `
+    -Url $downloadUrl `
+    -ExpectedSignature '2485A7AFA98E178CB8F30C9838346B514AEA4769'
+
+Invoke-PesterTests -TestFile "WinAppDriver" -TestName "WinAppDriver"

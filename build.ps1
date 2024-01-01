@@ -14,7 +14,9 @@ Write-Output "Building the image for repository ${dockerRepository} with tag ${d
 
 # build and push (two tags: https://stackoverflow.com/a/31963727/5770014)
 
-("layer1", "layer2", "layer3", "layer4") | % {
+$ret = $true
+
+("layer1", "layer2", "layer3" <#, "layer4"#>) | % {
     $layer = $_;
 
     docker build `
@@ -23,7 +25,12 @@ Write-Output "Building the image for repository ${dockerRepository} with tag ${d
     --isolation="hyperv" `
     --build-arg GIT_TOKEN=$gitToken `
     -f $dockerPath $workSpace/contents
+    $ret = $ret -and $?
 
+    if ($ret -eq $false) {
+        Write-Output "Failed to build layer ${layer}"
+        exit 1
+    }
     # docker push "${dockerRegistry}/${dockerRepository}:${layer}"
 
 }

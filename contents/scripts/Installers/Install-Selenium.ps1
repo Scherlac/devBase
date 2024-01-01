@@ -3,32 +3,27 @@
 ##  Desc:  Install Selenium Server standalone
 ################################################################################
 
-# Acquire latest Selenium release number from GitHub API
-$latestReleaseUrl = "https://api.github.com/repos/SeleniumHQ/selenium/releases/latest"
-try {
-    $latestReleaseInfo = Invoke-RestMethodAuth -Uri $latestReleaseUrl
-} catch {
-    Write-Error $_
-    exit 1
-}
-Write-Debug $latestReleaseInfo
-$seleniumVersionString = $latestReleaseInfo.name.Split(" ")[1]
-Write-Debug $seleniumVersionString
-$seleniumVersion = [version]::Parse($seleniumVersionString)
-
-# Download Selenium
-Write-Host "Downloading selenium-server-standalone v$seleniumVersion..."
-
-$seleniumReleaseUrl = "https://selenium-release.storage.googleapis.com/$($seleniumVersion.ToString(2))/selenium-server-standalone-$($seleniumVersion.ToString(3)).jar"
+# Create Selenium directory
 $seleniumDirectory = "C:\selenium\"
-$seleniumFileName = "selenium-server-standalone.jar"
-
 New-Item -ItemType directory -Path $seleniumDirectory
 
-Start-DownloadWithRetry -Url $seleniumReleaseUrl -Name $seleniumFileName -DownloadPath $seleniumDirectory
+# Download Selenium
+$seleniumMajorVersion = (Get-ToolsetContent).selenium.version
 
-Write-Host "Add selenium jar to the environment variables..."
-$seleniumBinPath = Join-Path $seleniumDirectory $seleniumFileName
-setx "SELENIUM_JAR_PATH" "$($seleniumBinPath)" /M
+$seleniumDownloadUrl = Resolve-GithubReleaseAssetUrl `
+    -Repo "SeleniumHQ/selenium" `
+    -Version "$seleniumMajorVersion.*" `
+    -Asset "selenium-server-*.jar" `
+    -AllowMultipleMatches
+
+$seleniumBinPath = Join-Path $seleniumDirectory "selenium-server.jar"
+Invoke-DownloadWithRetry -Url $seleniumDownloadUrl -Path $seleniumBinPath
+
+# Create an empty file to retrive Selenium version
+$seleniumFullVersion = $seleniumDownloadUrl.Split("-")[1].Split("/")[0]
+New-Item -Path $seleniumDirectory -Name "selenium-server-$seleniumFullVersion"
+
+# Add SELENIUM_JAR_PATH environment variable
+[Environment]::SetEnvironmentVariable("SELENIUM_JAR_PATH", $seleniumBinPath, "Machine")
 
 Invoke-PesterTests -TestFile "Browsers" -TestName "Selenium"

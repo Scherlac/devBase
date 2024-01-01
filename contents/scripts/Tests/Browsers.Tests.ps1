@@ -47,6 +47,12 @@ Describe "Chrome" {
             $chromePath | Should -Exist
             $chromeName | Should -BeExactly "chrome.exe"
         }
+
+        It "Chrome and Chrome Driver major versions are the same" -TestCases @{chromePath = $chromePath} {
+            $chromeMajor = (Get-Item $chromePath).VersionInfo.ProductMajorPart
+            $chromeDriverMajor = (Get-Content $env:ChromeWebDriver\versioninfo.txt).Split(".")[0]
+            $chromeMajor | Should -BeExactly $chromeDriverMajor
+        }
     }
 }
 
@@ -139,15 +145,15 @@ Describe "Internet Explorer" {
 }
 
 Describe "Selenium" {
-    It "Selenium 'C:\selenium' path exists" {
-        "C:\selenium" | Should -Exist
+    BeforeAll {
+        $seleniumBinPath = "C:\selenium\selenium-server.jar"
     }
 
-    It "Selenium Server 'selenium-server-standalone.jar' is installed" {
-        "C:\selenium\selenium-server-standalone.jar" | Should -Exist
+    It "Selenium server is installed" {
+        $seleniumBinPath | Should -Exist
     }
 
     It "SELENIUM_JAR_PATH environment variable exists" {
-        Get-EnvironmentVariable "SELENIUM_JAR_PATH" | Should -BeExactly "C:\selenium\selenium-server-standalone.jar"
+        Get-EnvironmentVariable "SELENIUM_JAR_PATH" | Should -BeExactly "$seleniumBinPath"
     }
 }

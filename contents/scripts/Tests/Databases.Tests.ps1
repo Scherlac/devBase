@@ -1,17 +1,37 @@
 Describe "MongoDB" {
-    It "<ToolName>" -TestCases @(
-        @{ ToolName = "mongo" }
-        @{ ToolName = "mongod" }
-    ) {
-        "$ToolName --version" | Should -ReturnZeroExitCode
+    Context "Version" {
+        It "<ToolName>" -TestCases @(
+            @{ ToolName = "mongo" }
+            @{ ToolName = "mongod" }
+        ) {
+            $toolsetVersion = (Get-ToolsetContent).mongodb.version
+            (& $ToolName --version)[2].Split('"')[-2] | Should -BeLike "$toolsetVersion*"
+        }
+    }
+
+    Context "Service" {
+        $mongoService = Get-Service -Name mongodb -ErrorAction Ignore
+        $mongoServiceTests = @{
+            Name      = $mongoService.Name
+            Status    = $mongoService.Status
+            StartType = $mongoService.StartType
+        }
+
+        It "<Name> service is stopped" -TestCases $mongoServiceTests {
+            $Status | Should -Be "Stopped"
+        }
+
+        It "<Name> service is disabled" -TestCases $mongoServiceTests {
+            $StartType | Should -Be "Disabled"
+        }
     }
 }
 
 Describe "PostgreSQL" {
     $psqlTests = @(
-        @{envVar = "PGROOT"; pgPath = Get-EnvironmentVariable "PGROOT"}
-        @{envVar = "PGBIN"; pgPath = Get-EnvironmentVariable "PGBIN"}
-        @{envVar = "PGDATA"; pgPath = Get-EnvironmentVariable "PGDATA"}
+        @{envVar = "PGROOT"; pgPath = Get-EnvironmentVariable "PGROOT" }
+        @{envVar = "PGBIN"; pgPath = Get-EnvironmentVariable "PGBIN" }
+        @{envVar = "PGDATA"; pgPath = Get-EnvironmentVariable "PGDATA" }
     )
 
     Context "Environment variable" {
@@ -37,8 +57,8 @@ Describe "PostgreSQL" {
     Context "Service" {
         $psqlService = Get-Service -Name postgresql*
         $psqlServiceTests = @{
-            Name = $psqlService.Name
-            Status = $psqlService.Status
+            Name      = $psqlService.Name
+            Status    = $psqlService.Status
             StartType = $psqlService.StartType
         }
 
@@ -50,11 +70,21 @@ Describe "PostgreSQL" {
             $StartType | Should -Be "Disabled"
         }
     }
+
+    Context "PostgreSQL version" {
+        It "PostgreSQL version should correspond to the version in the toolset" {
+            $toolsetVersion = (Get-ToolsetContent).postgresql.version
+            # Client version
+            (& $env:PGBIN\psql --version).split()[-1] | Should -BeLike "$toolsetVersion*"
+            # Server version
+            (& $env:PGBIN\pg_config --version).split()[-1] | Should -BeLike "$toolsetVersion*"
+        }
+    }
 }
 
 Describe "MySQL" {
     It "MySQL CLI" {
-        "mysql -V" | Should -ReturnZeroExitCode
+        $MysqlVersion = (Get-ToolsetContent).mysql.version
+        mysql -V | Should -BeLike "*${MysqlVersion}*"
     }
 }
-

@@ -3,26 +3,34 @@
 ##  Desc:  Install the CodeQL CLI Bundle to the toolcache.
 ################################################################################
 
-# Retrieve the name of the CodeQL bundle preferred by the Action (in the format codeql-bundle-YYYYMMDD).
-$CodeQLBundleName = (Invoke-RestMethodAuth "https://raw.githubusercontent.com/github/codeql-action/main/src/defaults.json").bundleVersion
-# Convert the bundle name to a version number (0.0.0-YYYYMMDD).
-$CodeQLBundleVersion = "0.0.0-" + $CodeQLBundleName.split("-")[-1]
+# Retrieve the CLI version of the latest CodeQL bundle.
+$defaults = (Invoke-RestMethod "https://raw.githubusercontent.com/github/codeql-action/v2/src/defaults.json")
+$cliVersion = $defaults.cliVersion
+$tagName = "codeql-bundle-v" + $cliVersion
 
-$ExtractionDirectory = Join-Path $Env:AGENT_TOOLSDIRECTORY -ChildPath "CodeQL" | Join-Path -ChildPath $CodeQLBundleVersion | Join-Path -ChildPath "x64"
-New-Item -Path $ExtractionDirectory -ItemType Directory -Force | Out-Null
+Write-Host "Downloading CodeQL bundle $($cliVersion)..."
+# Note that this is the all-platforms CodeQL bundle, to support scenarios where customers run
+# different operating systems within containers.
+$codeQLBundlePath = Invoke-DownloadWithRetry "https://github.com/github/codeql-action/releases/download/$($tagName)/codeql-bundle.tar.gz"
+$downloadDirectoryPath = (Get-Item $codeQLBundlePath).Directory.FullName
 
-Write-Host "Downloading CodeQL bundle $CodeQLBundleVersion..."
-$CodeQLBundlePath = Start-DownloadWithRetry -Url "https://github.com/github/codeql-action/releases/download/$CodeQLBundleName/codeql-bundle.tar.gz" -Name "codeql-bundle.tar.gz"
-$DownloadDirectoryPath = (Get-Item $CodeQLBundlePath).Directory.FullName
-Extract-7Zip -Path $CodeQLBundlePath -DestinationPath $DownloadDirectoryPath
-$UnGzipedCodeQLBundlePath = Join-Path $DownloadDirectoryPath "codeql-bundle.tar"
-Extract-7Zip -Path $UnGzipedCodeQLBundlePath -DestinationPath $ExtractionDirectory
+$codeQLToolcachePath = Join-Path $env:AGENT_TOOLSDIRECTORY -ChildPath "CodeQL" | Join-Path -ChildPath $cliVersion | Join-Path -ChildPath "x64"
+New-Item -Path $codeQLToolcachePath -ItemType Directory -Force | Out-Null
 
-# Touch a special file that indicates to the CodeQL Action that this bundle was baked-in to the hosted runner images.
-New-Item -ItemType file (Join-Path $ExtractionDirectory -ChildPath "pinned-version")
+Write-Host "Unpacking the downloaded CodeQL bundle archive..."
+Expand-7ZipArchive -Path $codeQLBundlePath -DestinationPath $downloadDirectoryPath
+$unGzipedCodeQLBundlePath = Join-Path $downloadDirectoryPath "codeql-bundle.tar"
+Expand-7ZipArchive -Path $unGzipedCodeQLBundlePath -DestinationPath $codeQLToolcachePath
+
+Write-Host "CodeQL bundle at $($codeQLToolcachePath) contains the following directories:"
+Get-ChildItem -Path $codeQLToolcachePath -Depth 2
+
+# Touch a file to indicate to the CodeQL Action that this bundle shipped with the toolcache. This is
+# to support overriding the CodeQL version specified in defaults.json on GitHub Enterprise.
+New-Item -ItemType file (Join-Path $codeQLToolcachePath -ChildPath "pinned-version")
 
 # Touch a file to indicate to the toolcache that setting up CodeQL is complete.
-New-Item -ItemType file "$ExtractionDirectory.complete"
+New-Item -ItemType file "$codeQLToolcachePath.complete"
 
-# Test that the tool has been extracted successfully.
-Invoke-PesterTests -TestFile "Tools" -TestName "CodeQLBundle"
+# Test that the tools have been extracted successfully.
+Invoke-PesterTests -TestFile "Tools" -TestName "CodeQL Bundle"

@@ -1,30 +1,36 @@
 ################################################################################
 ##  File:  Install-MysqlCli.ps1
 ##  Desc:  Install Mysql CLI
+##  Supply chain security: checksum validation (visual c++ redistributable package)
 ################################################################################
 
-## Downloading mysql jar
-$MysqlVersionName = "mysql-5.7.21-winx64"
-$MysqlVersionUrl = "https://dev.mysql.com/get/Downloads/MySQL-5.7/${MysqlVersionName}.zip"
-$MysqlPath = "C:\$MysqlVersionName\bin"
+# Installing visual c++ redistributable package.
+Install-Binary `
+    -Url 'https://download.microsoft.com/download/0/5/6/056dcda9-d667-4e27-8001-8a0c6971d6b1/vcredist_x64.exe' `
+    -InstallArgs @("/install", "/quiet", "/norestart") `
+    -ExpectedSHA256Sum '20E2645B7CD5873B1FA3462B99A665AC8D6E14AAE83DED9D875FEA35FFDD7D7E'
 
-# Installing visual c++ redistibutable package.
-$InstallerName = "vcredist_x64.exe"
-$InstallerURI = "https://download.microsoft.com/download/0/5/6/056dcda9-d667-4e27-8001-8a0c6971d6b1/${InstallerName}"
-$ArgumentList = ("/install", "/quiet", "/norestart")
+# Downloading mysql
+[version] $mysqlVersion = (Get-ToolsetContent).mysql.version
+$mysqlVersionMajorMinor = $mysqlVersion.ToString(2)
 
-Install-Binary -Url $InstallerURI -Name $InstallerName -ArgumentList $ArgumentList
+if ($mysqlVersion.Build -lt 0) {
+    $downloadsPageUrl = "https://dev.mysql.com/downloads/mysql/${mysqlVersionMajorMinor}.html"
+    $mysqlVersion = Invoke-RestMethod -Uri $downloadsPageUrl -Headers @{ 'User-Agent' = 'curl/8.4.0' } `
+    | Select-String -Pattern "${mysqlVersionMajorMinor}\.\d+" `
+    | ForEach-Object { $_.Matches.Value }
+}
 
-# MySQL disabled TLS 1.0 support on or about Jul-14-2018.  Need to make sure TLS 1.2 is enabled.
-[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor "Tls12"
+$mysqlVersionFull = $mysqlVersion.ToString()
+$mysqlVersionUrl = "https://cdn.mysql.com/Downloads/MySQL-${mysqlVersionMajorMinor}/mysql-${mysqlVersionFull}-winx64.msi"
 
-# Get the latest mysql command line tools .
-$mysqlArchPath = Start-DownloadWithRetry -Url $MysqlVersionUrl -Name "mysql.zip"
-
-# Expand the zip
-Extract-7Zip -Path $mysqlArchPath -DestinationPath "C:\"
+Install-Binary `
+    -Url $mysqlVersionUrl `
+    -ExpectedSignature (Get-ToolsetContent).mysql.signature
 
 # Adding mysql in system environment path
-Add-MachinePathItem $mysqlPath
+$mysqlPath = $(Get-ChildItem -Path "C:\PROGRA~1\MySQL" -Directory)[0].FullName
+
+Add-MachinePathItem "${mysqlPath}\bin"
 
 Invoke-PesterTests -TestFile "Databases" -TestName "MySQL"

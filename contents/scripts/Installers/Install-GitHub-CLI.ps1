@@ -1,15 +1,27 @@
 ################################################################################
 ##  File:  Install-GitHub-CLI.ps1
 ##  Desc:  Install GitHub CLI
+##  Supply chain security: GitHub CLI - checksum validation
 ################################################################################
 
 Write-Host "Get the latest gh version..."
 
-$Name = "gh_windows_amd64.msi"
-$Assets = (Invoke-RestMethodAuth -Uri "https://api.github.com/repos/cli/cli/releases/latest").assets
-$DownloadUrl = ($Assets.browser_download_url -match "windows_amd64.msi") | Select-Object -First 1
+$downloadUrl = Resolve-GithubReleaseAssetUrl `
+    -Repo "cli/cli" `
+    -Version "latest" `
+    -UrlMatchPattern "gh_*_windows_amd64.msi"
 
-Install-Binary -Url $DownloadUrl -Name $Name
+$checksumsUrl = Resolve-GithubReleaseAssetUrl `
+    -Repo "cli/cli" `
+    -Version "latest" `
+    -UrlMatchPattern "gh_*_checksums.txt"
+$externalHash = Get-ChecksumFromUrl -Type "SHA256" `
+    -Url $checksumsUrl `
+    -FileName (Split-Path $downloadUrl -Leaf)
+
+Install-Binary `
+    -Url $downloadUrl `
+    -ExpectedSHA256Sum $externalHash
 
 Add-MachinePathItem "C:\Program Files (x86)\GitHub CLI"
 

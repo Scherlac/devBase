@@ -1,0 +1,321 @@
+{
+    "toolcache": [
+        {
+            "name": "Ruby",
+            "arch": "x64",
+            "platform" : "win32",
+            "versions": [
+                "2.7",
+                "3.0",
+                "3.1"
+            ],
+            "default": "3.0"
+        },
+        {
+            "name": "Python",
+            "url" : "https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json",
+            "arch": "x64",
+            "platform" : "win32",
+            "versions": [
+                "3.10.*",
+                "3.11.*",
+                "3.12.*"
+            ],
+            "default": "3.11.*"
+        },
+        {
+            "name": "Python",
+            "url" : "https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json",
+            "arch": "x86",
+            "platform" : "win32",
+            "versions": [
+                "3.10.*",
+                "3.11.*",
+                "3.12.*"
+            ]
+        },
+        {
+            "name": "PyPy",
+            "arch": "x86",
+            "platform" : "win64",
+            "versions": [
+                "3.9",
+                "3.10"
+            ]
+        },
+        {
+            "name": "node",
+            "url" : "https://raw.githubusercontent.com/actions/node-versions/main/versions-manifest.json",
+            "arch": "x64",
+            "platform" : "win32",
+            "versions": [
+                "16.*",
+                "18.*",
+                "20.*"
+            ]
+        },
+        {
+            "name": "go",
+            "url" : "https://raw.githubusercontent.com/actions/go-versions/main/versions-manifest.json",
+            "arch": "x64",
+            "platform" : "win32",
+            "versions": [
+                "1.19.*",
+                "1.20.*",
+                "1.21.*"
+            ],
+            "default": "1.20.*"
+        }
+    ],
+    "powershellModules": [
+        { "name": "DockerMsftProvider" },
+        { "name": "MarkdownPS" },
+        { "name": "Pester" },
+        { "name": "PowerShellGet" },
+        { "name": "PSScriptAnalyzer" },
+        { "name": "PSWindowsUpdate" },
+        { "name": "SqlServer" },
+        { "name": "VSSetup" }
+    ],
+    "otherPowershellModules": [
+        { "name": "Microsoft.Graph" },
+        {"name": "AWSPowershell"}
+    ],
+    "azureModules": [
+        {
+            "name": "azurerm",
+            "versions": [
+                "2.1.0",
+                "6.13.1"
+            ],
+            "zip_versions": [
+                "3.8.0",
+                "4.2.1",
+                "5.1.1",
+                "6.7.0"
+            ],
+            "default": "2.1.0"
+        },
+        {
+            "name": "azure",
+            "versions": [
+                "2.1.0",
+                "5.3.0"
+            ],
+            "zip_versions": [
+                "3.8.0",
+                "4.2.1",
+                "5.1.1"
+            ],
+            "default": "2.1.0"
+        },
+        {
+            "name": "az",
+            "versions": [
+                "9.3.0"
+            ],
+            "zip_versions": [
+                "7.5.0"
+            ]
+        }
+    ],
+    "java": {
+        "default": "21",
+        "versions": [ "17", "21"]
+    },
+    "android": {
+        "commandline_tools_url": "https://dl.google.com/android/repository/commandlinetools-win-9123335_latest.zip",
+        "hash": "8A90E6A3DEB2FA13229B2E335EFD07687DCC8A55A3C544DA9F40B41404993E7D",
+        "platform_min_version": "27",
+        "build_tools_min_version": "27.0.0",
+        "extras": [
+            "android;m2repository",
+            "google;m2repository",
+            "google;google_play_services"
+        ],
+        "addons": [],
+        "additional_tools": [
+            "cmake;3.18.1",
+            "cmake;3.22.1"
+        ],
+        "ndk": {
+            "default": "25",
+            "versions": [
+                "24", "25", "26"
+            ]
+        }
+    },
+    "mingw": {
+        "version": "12.2.0",
+        "runtime": "ucrt"
+    },
+    "MsysPackages": {
+        "msys2": [],
+        "mingw": []
+    },
+    "windowsFeatures": [
+        { "name": "Containers" },
+        { "name": "Microsoft-Windows-Subsystem-Linux", "optionalFeature": true },
+        { "name": "VirtualMachinePlatform", "optionalFeature": true },
+        { "name": "NET-Framework-45-Features", "includeAllSubFeatures": true },
+        { "name": "Client-ProjFS", "optionalFeature": true },
+        { "name": "NET-Framework-Features", "includeAllSubFeatures": true },
+        { "name": "Hyper-V", "includeAllSubFeatures": true },
+        { "name": "HypervisorPlatform", "optionalFeature": true },
+        { "name": "Hyper-V-PowerShell" }
+    ],
+    "visualStudio": {
+        "version" : "2022",
+        "subversion" : "17",
+        "edition" : "BuildTools",
+        "channel": "release",
+        "signature": "72105B6D5F370B62FD5C82F1512F7AD7DEE5F2C0",
+        "url": "https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022",
+        "workloads": [
+            "Microsoft.VisualStudio.Workload.AzureBuildTools",
+            "Microsoft.VisualStudio.Workload.DataBuildTools",
+            "Microsoft.VisualStudio.Workload.MSBuildTools",
+            "Microsoft.VisualStudio.Workload.NodeBuildTools",
+            "Microsoft.VisualStudio.Workload.VCTools"
+
+
+        ],
+        "allworkloads": [
+            "Microsoft.VisualStudio.Workload.AzureBuildTools",
+            "Microsoft.VisualStudio.Workload.DataBuildTools",
+            "Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools",
+            "Microsoft.VisualStudio.Workload.MSBuildTools",
+            "Microsoft.VisualStudio.Workload.NodeBuildTools",
+            "Microsoft.VisualStudio.Workload.OfficeBuildTools",
+            "Microsoft.VisualStudio.Workload.UniversalBuildTools",
+            "Microsoft.VisualStudio.Workload.VCTools",
+            "Microsoft.VisualStudio.Workload.VisualStudioExtensionBuildTools",
+            "Microsoft.VisualStudio.Workload.WebBuildTools",
+            "Microsoft.VisualStudio.Workload.XamarinBuildTools"
+
+        ],
+        "vsix": [],
+        "allvsix": [
+            "SSIS.MicrosoftDataToolsIntegrationServices",
+            "VisualStudioClient.MicrosoftVisualStudio2022InstallerProjects",
+            "WixToolset.WixToolsetVisualStudio2022Extension",
+            "ProBITools.MicrosoftReportProjectsforVisualStudio2022",
+            "ProBITools.MicrosoftAnalysisServicesModelingProjects2022"
+        ]
+    },
+    "docker": {
+        "images": [
+            "mcr.microsoft.com/windows/servercore:ltsc2022",
+            "mcr.microsoft.com/windows/nanoserver:ltsc2022",
+            "mcr.microsoft.com/dotnet/framework/aspnet:4.8-windowsservercore-ltsc2022",
+            "mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2022",
+            "mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2022"
+        ]
+    },
+    "pipx": [
+        {
+            "package": "yamllint",
+            "cmd": "yamllint --version"
+        }
+    ],
+    "selenium": {
+        "version": "4"
+    },
+    "npm": {
+        "disabled": true,
+        "notes": "installed and managed in docker file",
+        "global_packages": [
+            { "name": "yarn", "test": "yarn --version" },
+            { "name": "newman", "test": "newman --version" },
+            { "name": "lerna", "test": "lerna --version" },
+            { "name": "gulp-cli", "test": "gulp --version" },
+            { "name": "grunt-cli", "test": "grunt --version" }
+        ]
+    },
+    "serviceFabric": {
+        "runtime": {
+            "version": "9.1.1436.9590",
+            "checksum": "089F9BE6A63AF66C337E507B52082575C8ED330DF765259C6F2F13F900DA96D5"
+        },
+        "sdk": {
+            "version": "6.1.1436",
+            "checksum": "D2A6B58315D08B6E46C2D25E91DFA1163136F70A5FA8CEF9DB147F07EE001AD1"
+        }
+    },
+    "dotnet": {
+        "versions": [
+            "6.0",
+            "7.0",
+            "8.0"
+        ],
+        "tools": [
+            { "name": "nbgv", "test": "nbgv --version", "getversion": "nbgv --version" }
+        ],
+        "warmup": false
+    },
+    "choco": {
+        "common_packages": [
+            { "name": "7zip.install" },
+            { "disabled": true, "name": "aria2" },
+            { "name": "azcopy10" },
+            { "name": "Bicep" },
+            { "disabled": true, "name": "innosetup" },
+            { "name": "jq" },
+            { "name": "NuGet.CommandLine" },
+            { "name": "packer" },
+            {   "disabled": true, 
+                "name": "strawberryperl" ,
+                "args": [ "--version", "5.32.1.1" ]
+            },
+            { "name": "pulumi" },
+            { "disabled": true, "name": "tortoisesvn" },
+            { "name": "swig" },
+            { "name": "vswhere" },
+            {   "disabled": true, 
+                "name": "julia",
+                "args": [ "--ia", "/DIR=C:\\Julia" ]
+            },
+            {
+                "name": "cmake.install",
+                "args": [ "--installargs", "ADD_CMAKE_TO_PATH=\"System\"" ]
+            },
+            { "name": "imagemagick" }
+        ]
+    },
+    "node": {
+        "default": "18"
+    },
+    "maven": {
+        "version": "3.8"
+    },
+    "mysql": {
+        "version": "8.0",
+        "signature": "DD34D7C71F160972DE0CE25B695A0D6A9C95BD91"
+    },
+    "mongodb": {
+        "version": "5.0",
+        "signature": "F2D7C28591847BB2CB2B1C2A0C59459FDC728A38"
+    },
+    "nsis": {
+        "version": "3.09"
+    },
+    "llvm": {
+        "version": "16"
+    },
+    "php": {
+        "version": "8.2"
+    },
+    "postgresql": {
+        "version": "14",
+        "signature": "698BA51AA27CC31282AACA5055E4B9190BC6C0E9"
+    },
+    "kotlin": {
+        "version": "latest"
+    },
+    "openssl": {
+        "version": "3.0.12"
+    },
+    "pwsh": {
+        "version": "7.4"
+    }
+}

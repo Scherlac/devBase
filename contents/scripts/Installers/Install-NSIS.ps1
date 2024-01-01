@@ -1,12 +1,14 @@
 ################################################################################
 ##  File:  Install-NSIS.ps1
 ##  Desc:  Install NSIS
+##  Supply chain security: NSIS - managed by package manager
 ################################################################################
 
-Install-Binary -Url 'https://downloads.sourceforge.net/project/nsis/NSIS%203/3.06.1/nsis-3.06.1-setup.exe' -Name  nsis-3.06.1-setup.exe -ArgumentList ('/S')
+$nsisVersion = (Get-ToolsetContent).nsis.version
 
-$NsisPath = "${env:ProgramFiles(x86)}\NSIS\"
-Add-MachinePathItem $NsisPath
-$env:Path = Get-MachinePath
+Install-ChocoPackage nsis -ArgumentList "--version", "$nsisVersion"
+
+Add-MachinePathItem "${env:ProgramFiles(x86)}\NSIS\"
+Update-Environment
 
 Invoke-PesterTests -TestFile "Tools" -TestName "NSIS"

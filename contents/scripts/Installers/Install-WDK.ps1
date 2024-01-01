@@ -4,30 +4,32 @@
 ################################################################################
 
 # Requires Windows SDK with the same version number as the WDK
-if (Test-IsWin19)
-{
-    $winSdkUrl = "https://go.microsoft.com/fwlink/p/?linkid=2120843"
-    $wdkUrl = "https://go.microsoft.com/fwlink/?linkid=2128854"
-    $FilePath = "C:\Program Files (x86)\Windows Kits\10\Vsix\VS2019\WDK.vsix"
-    $VSver = "2019"
+if (Test-IsWin19) {
+    # Install all features without showing the GUI using winsdksetup.exe
+    Install-Binary -Type EXE `
+        -Url 'https://go.microsoft.com/fwlink/?linkid=2173743' `
+        -InstallArgs @("/features", "+", "/quiet") `
+        -ExpectedSignature '44796EB5BD439B4BFB078E1DC2F8345AE313CBB1'
+
+    $wdkUrl = "https://go.microsoft.com/fwlink/?linkid=2166289"
+    $wdkSignatureThumbprint = "914A09C2E02C696AF394048BCB8D95449BCD5B9E"
+    $wdkExtensionPath = "C:\Program Files (x86)\Windows Kits\10\Vsix\VS2019\WDK.vsix"
+} elseif (Test-IsWin22) {
+    # SDK is available through Visual Studio
+    $wdkUrl = "https://go.microsoft.com/fwlink/?linkid=2249371"
+    $wdkSignatureThumbprint = "7C94971221A799907BB45665663BBFD587BAC9F8"
+    $wdkExtensionPath = "C:\Program Files (x86)\Windows Kits\10\Vsix\VS2022\*\WDK.vsix"
+} else {
+    throw "Invalid version of Visual Studio is found. Either 2019 or 2022 are required"
 }
-else
-{
-    $winSdkUrl = "https://go.microsoft.com/fwlink/p/?LinkID=2023014"
-    $wdkUrl = "https://go.microsoft.com/fwlink/?linkid=2026156"
-    $FilePath = "C:\Program Files (x86)\Windows Kits\10\Vsix\WDK.vsix"
-    $VSver = "2017"
-}
 
-$argumentList = ("/features", "+", "/quiet")
-
-# `winsdksetup.exe /features + /quiet` installs all features without showing the GUI
-Install-Binary -Url $winSdkUrl -Name "winsdksetup.exe" -ArgumentList $argumentList
-
-# `wdksetup.exe /features + /quiet` installs all features without showing the GUI
-Install-Binary -Url $wdkUrl -Name "wdksetup.exe" -ArgumentList $argumentList
+# Install all features without showing the GUI using wdksetup.exe
+Install-Binary -Type EXE `
+    -Url $wdkUrl `
+    -InstallArgs @("/features", "+", "/quiet") `
+    -ExpectedSignature $wdkSignatureThumbprint
 
 # Need to install the VSIX to get the build targets when running VSBuild
-Install-VsixExtension -FilePath $FilePath -Name "WDK.vsix" -VSversion $VSver -InstallOnly
+Install-VSIXFromFile (Resolve-Path -Path $wdkExtensionPath)
 
 Invoke-PesterTests -TestFile "WDK"

@@ -17,6 +17,10 @@ $releaseInPath = $toolset.visualStudio.edition
 $subVersion = $toolset.visualStudio.subversion
 $bootstrapperUrl = "https://aka.ms/vs/${subVersion}/release/vs_${releaseInPath}.exe"
 
+# Source: https://learn.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio?view=vs-2022
+# https://aka.ms/vs/17/release/vs_buildtools.exe
+#                                 buildtools
+
 # Install VS
 Install-VisualStudio -BootstrapperUrl $bootstrapperUrl -WorkLoads $workLoadsArgument
 
