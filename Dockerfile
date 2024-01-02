@@ -190,11 +190,12 @@ COPY scripts/Tests/ChocoPackages.Tests.ps1 ./Tests/
 RUN .\Installers\Install-ChocolateyPackages.ps1;
 
 COPY scripts/Installers/Install-JavaTools.ps1 ./Installers/
-
+COPY scripts/Tests/Java.Tests.ps1 ./Tests/
 RUN .\Installers\Install-JavaTools.ps1;
 # Kotlin is installed in the previous layer with other tools related to Tools.Tests.ps1
 
 COPY scripts/Installers/Install-OpenSSL.ps1 ./Installers/
+#COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
 RUN .\Installers\Install-OpenSSL.ps1;
 
 
@@ -210,7 +211,7 @@ RUN .\Installers\Install-OpenSSL.ps1;
 #   provisioner "powershell" {
 #     scripts = [
 #       "${path.root}/../scripts/build/Install-ActionsCache.ps1",
-#       "${path.root}/../scripts/build/Install-Ruby.ps1",
+#  *     "${path.root}/../scripts/build/Install-Ruby.ps1",
 #  *     "${path.root}/../scripts/build/Install-PyPy.ps1",
 #  *     "${path.root}/../scripts/build/Install-Toolset.ps1",
 #  *     "${path.root}/../scripts/build/Configure-Toolset.ps1",
@@ -261,39 +262,49 @@ RUN .\Installers\Install-OpenSSL.ps1;
 COPY scripts/Installers/Install-PyPy.ps1 ./Installers/
 RUN .\Installers\Install-PyPy.ps1;
 
+COPY scripts/Installers/Install-Ruby.ps1 ./Installers/
+RUN .\Installers\Install-Ruby.ps1;
+
 COPY scripts/Installers/Install-Toolset.ps1 scripts/Installers/Configure-Toolset.ps1 ./Installers/
+COPY scripts/Tests/Toolset.Tests.ps1 ./Tests/
 RUN .\Installers\Install-Toolset.ps1; `
      .\Installers\Configure-Toolset.ps1;
 
 # Note: Node installation is moved to the next layer due to the extended time it takes to install and configure
 
 COPY scripts/Installers/Install-PowershellAzModules.ps1 ./Installers/
+COPY scripts/Tests/PowershellAzModules.Tests.ps1 ./Tests/
 RUN .\Installers\Install-PowershellAzModules.ps1;
 
-COPY scripts/Installers/Install-Git.ps1 scripts/Installers/Install-GitHub-CLI.ps1 ./Installers/
+COPY scripts/Installers/Install-Git.ps1 ./Installers/
+COPY scripts/Tests/Git.Tests.ps1 ./Tests/
 RUN .\Installers\Install-Git.ps1;
 # GitHub CLI is installed in the previous layer with other CLI tools
 
 COPY scripts/Installers/Install-DotnetSDK.ps1 ./Installers/
+COPY scripts/Tests/DotnetSDK.Tests.ps1 ./Tests/
 RUN .\Installers\Install-DotnetSDK.ps1;
 
 COPY scripts/Installers/Install-Miniconda.ps1 ./Installers/
+COPY scripts/Tests/Miniconda.Tests.ps1 ./Tests/
 RUN .\Installers\Install-Miniconda.ps1;
 
 COPY scripts/Installers/Install-Vcpkg.ps1 ./Installers/
+#COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
 RUN .\Installers\Install-Vcpkg.ps1;
 
 COPY scripts/Installers/Install-RootCA.ps1 ./Installers/
 RUN .\Installers\Install-RootCA.ps1;
 
 
-FROM localhost:5000/windows-servercore-devbase:layer2 AS layer3
+FROM layer2 AS layer3
 
 ARG artifactoryNPMVirtualUrl="https://registry.npmjs.org/"
 ARG npmEmail
 ARG npmApiKey
 
 COPY scripts/Installers/Install-NodeJS.ps1 ./Installers/
+COPY scripts/Tests/Node.Tests.ps1 ./Tests/
 RUN .\Installers\Install-NodeJS.ps1;
 
 # "global_packages": [

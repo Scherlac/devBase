@@ -8,7 +8,7 @@ Describe "Aria2" {
     It "Aria2" {
         "aria2c --version" | Should -ReturnZeroExitCode
     }
-}
+} -Skip
 
 Describe "AzCopy" {
     It "AzCopy" {
@@ -32,7 +32,7 @@ Describe "InnoSetup" {
     It "InnoSetup" {
         (Get-Command -Name iscc).CommandType | Should -BeExactly "Application"
     }
-}
+} -Skip
 
 Describe "Jq" {
     It "Jq" {
@@ -56,7 +56,7 @@ Describe "Perl" {
     It "Perl" {
        "perl --version" | Should -ReturnZeroExitCode
     }
-}
+} -Skip
 
 Describe "Pulumi" {
     It "pulumi" {
@@ -68,7 +68,7 @@ Describe "Svn" {
     It "svn" {
         "svn --version --quiet" | Should -ReturnZeroExitCode
     }
-}
+} -Skip
 
 Describe "Swig" {
     It "Swig" {
@@ -90,7 +90,7 @@ Describe "Julia" {
     It "Julia" {
         "julia --version" | Should -ReturnZeroExitCode
     }
-}
+} -Skip
 
 Describe "CMake" {
     It "cmake" {

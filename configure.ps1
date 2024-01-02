@@ -2,7 +2,7 @@ $baseTag="dev"
 
 $dockerRepository="scherlac/windows-servercore-devbase".ToLower()
 
-$dockerRegistry="localhost:5000/"
+$dockerRegistry=""
 
 $workSpace=([System.IO.Path]::GetFullPath($PSScriptRoot))
 $dockerPath=([System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot Dockerfile)))
