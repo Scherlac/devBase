@@ -58,21 +58,30 @@ Function Install-VisualStudio {
             "channelId"  = $channelId
             "productId"  = $productId
             "arch"       = "x64"
-            "add"        = $RequiredComponents | ForEach-Object { "$_;includeRecommended" }
+            "add"        = $RequiredComponents | ForEach-Object { "$_;includeRecommended" } 
         }
 
         # Create json file with response data
         $responseDataPath = "$env:TEMP\vs_install_response.json"
-        $responseData | ConvertTo-Json | Out-File -FilePath $responseDataPath
+        $responseData | ConvertTo-Json | Out-File -Encoding ascii -NoNewline -FilePath $responseDataPath
 
         $installStartTime = Get-Date
         Write-Host "Starting Install ..."
-        $bootstrapperArgumentList = ('/c', $bootstrapperFilePath, '--in', $responseDataPath, $ExtraArgs, '--quiet', '--norestart', '--wait', '--nocache' )
+        $bootstrapperArgumentList = @('/c', $bootstrapperFilePath, '--in', $responseDataPath, '--quiet', '--norestart', '--wait', '--nocache' )
+
+        if (-not [string]::IsNullOrEmpty($ExtraArgs)) {
+            $bootstrapperArgumentList += @( $ExtraArgs )
+        }
         Write-Host "Bootstrapper arguments: $bootstrapperArgumentList"
         $process = Start-Process -FilePath cmd.exe -ArgumentList $bootstrapperArgumentList -Wait -PassThru
 
         $exitCode = $process.ExitCode
         $installCompleteTime = [math]::Round(($(Get-Date) - $installStartTime).TotalSeconds, 2)
+
+        Write-Host "Current Visual Studio setup is as follows:"
+        $wl = ((Get-VSSetupInstance | Select-VSSetupInstance -Product *).packages | Where-Object { $_.Id -like '*Workload*' } | select -ExpandProperty Id)
+        Write-Host $wl
+        
         if ($exitCode -eq 0) {
             Write-Host "Installation successful in $installCompleteTime seconds"
             return $exitCode

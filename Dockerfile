@@ -136,7 +136,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 COPY scripts/Tests/VisualStudio.Tests.ps1 ./Tests/
 
 COPY scripts/Installers/Install-VisualStudio.ps1 ./Installers/
-# ~ 24.7GB --> 24.4GB???
+# ~ 24.7GB --> 7.63GB
 RUN .\Installers\Install-VisualStudio.ps1; `
      Invoke-Cleanup;
 
@@ -317,7 +317,7 @@ RUN .\Installers\Install-Git.ps1; `
 
 COPY scripts/Installers/Install-DotnetSDK.ps1 ./Installers/
 COPY scripts/Tests/DotnetSDK.Tests.ps1 ./Tests/
-# ~ 6.33GB --> 781MB
+# ~ 6.33GB --> 1.52GB
 RUN .\Installers\Install-DotnetSDK.ps1; `
      Invoke-Cleanup;
 
@@ -359,7 +359,7 @@ RUN .\Installers\Install-NodeJS.ps1; `
 #     { "name": "grunt-cli", "test": "grunt --version" }
 # ]
 
-# ~ 511MB --> 372MB
+# ~ 511MB --> 365MB
 #configure npm and install npm packages
 RUN npm install -g `
         cordova `
