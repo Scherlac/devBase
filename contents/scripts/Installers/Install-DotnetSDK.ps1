@@ -97,13 +97,15 @@ $installScriptPath = Invoke-DownloadWithRetry -Url "https://dot.net/v1/dotnet-in
 
 # Install and warm up dotnet
 foreach ($dotnetVersion in $dotnetToolset.versions) {
-    $sdkVersionsToInstall = Get-SDKVersionsToInstall -DotnetVersion $dotnetVersion
-    foreach ($sdkVersion in $sdkVersionsToInstall) {
+    # Install latest sdk version for each dotnet version
+    $sdkVersionsToInstall = ([array](Get-SDKVersionsToInstall -DotnetVersion $dotnetVersion))[-1]
+    $sdkVersion = $sdkVersionsToInstall
+    # foreach ($sdkVersion in $sdkVersionsToInstall) {
         Install-DotnetSDK -InstallScriptPath $installScriptPath -SDKVersion $sdkVersion -DotnetVersion $dotnetVersion
         if ($dotnetToolset.warmup) {
             Invoke-DotnetWarmup -SDKVersion $sdkVersion
         }
-    }
+    # }
 }
 
 # Add dotnet to PATH

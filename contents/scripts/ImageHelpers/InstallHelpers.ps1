@@ -1018,3 +1018,39 @@ function Update-Environment {
         }
     }
 }
+
+
+<#
+.SYNOPSIS
+    Cleanup temporary files and directories.
+#>
+function Invoke-Cleanup {
+    param(
+        $Path = $env:TEMP
+    )
+
+    Write-Host "Cleanup temporary files and directories in $($Path)"
+
+    $list = [array](Get-ChildItem -Path $Path -Recurse)
+
+    # print the items count of the $list
+    Write-Host "Items: $($list.Count)"
+
+    # we give some statistic about the current site of the folder
+    if ($list.Count -gt 0) { 
+        if ($list.Count -gt 1) {
+            $size = [int](( [array]$list | Measure-Object -Property Length -Sum).Sum / 1MB)
+        }
+        else {
+            $size = $list[0].Length / 1MB
+        }
+
+        Write-Host "The current site of the $($Path) is $($size)MB"
+
+        Write-Host "Cleanup in progress..."
+        Remove-Item -Path $Path\* -Recurse -Force -ErrorAction SilentlyContinue
+
+        Write-Host "Done"
+    }
+
+}

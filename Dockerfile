@@ -58,14 +58,16 @@ COPY toolsets ./toolsets/
 
 COPY scripts/Installers/Configure-PowerShell.ps1 scripts/Installers/Install-PowerShellModules.ps1 ./Installers/
 COPY scripts/Tests/PowerShellModules.Tests.ps1 ./Tests/
-# ~ 570MB
+# ~ 570MB --> 353MB
 RUN  `
      .\Installers\Configure-PowerShell.ps1; `
-     .\Installers\Install-PowerShellModules.ps1;
+     .\Installers\Install-PowerShellModules.ps1; `
+     Invoke-Cleanup;
 
-# ~ 55MB
+# ~ 55MB  --> 55MB
 COPY scripts/Installers/Install-Chocolatey.ps1 ./Installers/
-RUN .\Installers\Install-Chocolatey.ps1;
+RUN .\Installers\Install-Chocolatey.ps1; `
+     Invoke-Cleanup;
 
 # COPY scripts/Installers/Configure-BaseImage.ps1 ./Installers/
 # RUN      .\Installers\Configure-BaseImage.ps1;
@@ -79,9 +81,10 @@ RUN .\Installers\Install-Chocolatey.ps1;
 # COPY scripts/Installers/Configure-SystemEnvironment.ps1 ./Installers/
 # RUN      .\Installers\Configure-SystemEnvironment.ps1;
 
-# ~ 17MB
+# ~ 17MB --> 17MB
 COPY scripts/Installers/Configure-DotnetSecureChannel.ps1 ./Installers/
-RUN .\Installers\Configure-DotnetSecureChannel.ps1;
+RUN .\Installers\Configure-DotnetSecureChannel.ps1; `
+     Invoke-Cleanup;
 
 
 #   provisioner "powershell" {
@@ -106,10 +109,11 @@ RUN .\Installers\Configure-DotnetSecureChannel.ps1;
 
 # Moved to later sectio to have all Tools related test subject at similar location
 
-# ~ 115MB
+# ~ 115MB --> 107MB
 COPY scripts/Installers/Install-Runner.ps1 ./Installers/
 COPY scripts/Tests/RunnerCache.Tests.ps1 ./Tests/
-RUN .\Installers\Install-Runner.ps1;
+RUN .\Installers\Install-Runner.ps1; `
+     Invoke-Cleanup;
 
 FROM layer1 AS layer2
 
@@ -132,8 +136,9 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 COPY scripts/Tests/VisualStudio.Tests.ps1 ./Tests/
 
 COPY scripts/Installers/Install-VisualStudio.ps1 ./Installers/
-# ~ 24.7GB
-RUN .\Installers\Install-VisualStudio.ps1;
+# ~ 24.7GB --> 24.4GB???
+RUN .\Installers\Install-VisualStudio.ps1; `
+     Invoke-Cleanup;
 
 # COPY scripts/Installers/Install-VS.ps1 ./Installers/
 # RUN .\Installers\Install-VS.ps1;
@@ -141,13 +146,15 @@ RUN .\Installers\Install-VisualStudio.ps1;
 
 COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
 
-# ~ 561MB
+# ~ 561MB --> 451MB
 COPY scripts/Installers/Install-PowershellCore.ps1 ./Installers/
-RUN .\Installers\Install-PowershellCore.ps1;
+RUN .\Installers\Install-PowershellCore.ps1; `
+     Invoke-Cleanup;
 
-# ~ 68MB
+# ~ 68MB --> 66MB
 COPY scripts/Installers/Install-WebPlatformInstaller.ps1 ./Installers/
-RUN .\Installers\Install-WebPlatformInstaller.ps1;
+RUN .\Installers\Install-WebPlatformInstaller.ps1; `
+     Invoke-Cleanup;
 
 # COPY scripts/Installers/Install-KubernetesTools.ps1 ./Installers/
 # RUN .\Installers\Install-KubernetesTools.ps1;
@@ -173,17 +180,19 @@ RUN .\Installers\Install-WebPlatformInstaller.ps1;
 
 COPY scripts/Installers/Install-Wix.ps1 scripts/Installers/Install-WDK.ps1 scripts/Installers/Install-VSExtensions.ps1 ./Installers/
 COPY scripts/Tests/Wix.Tests.ps1 scripts/Tests/WDK.Tests.ps1 scripts/Tests/Vsix.Tests.ps1 ./Tests/
-# ~ 5.7GB
+# ~ 5.7GB --> 1.67GB
 RUN .\Installers\Install-Wix.ps1; `
      # .\Installers\Install-WDK.ps1; `
-     .\Installers\Install-VSExtensions.ps1;
+     .\Installers\Install-VSExtensions.ps1; `
+     Invoke-Cleanup;
 
 COPY scripts/Tests/CLI.Tools.Tests.ps1 ./Tests/
 
 COPY scripts/Installers/Install-AzureCli.ps1 scripts/Installers/Install-AzureDevOpsCli.ps1 ./Installers/
-# ~ 526MB
+# ~ 526MB --> 455MB
 RUN .\Installers\Install-AzureCli.ps1; `
-     .\Installers\Install-AzureDevOpsCli.ps1;
+     .\Installers\Install-AzureDevOpsCli.ps1; `
+     Invoke-Cleanup;
 
 # COPY scripts/Installers/Install-AWSTools.ps1 scripts/Installers/Install-AliyunCli.ps1 scripts/Installers/Install-CloudFoundryCli.ps1 ./Installers/
 # RUN .\Installers\Install-AWSTools.ps1; `
@@ -191,24 +200,28 @@ RUN .\Installers\Install-AzureCli.ps1; `
 #      .\Installers\Install-CloudFoundryCli.ps1;
 
 COPY scripts/Installers/Install-GitHub-CLI.ps1 ./Installers/
-# ~ 132MB
-RUN .\Installers\Install-GitHub-CLI.ps1;
+# ~ 132MB --> 114MB
+RUN .\Installers\Install-GitHub-CLI.ps1; `
+     Invoke-Cleanup;
 
 COPY scripts/Installers/Install-ChocolateyPackages.ps1 ./Installers/
 COPY scripts/Tests/ChocoPackages.Tests.ps1 ./Tests/
-# ~ 1.8GB
-RUN .\Installers\Install-ChocolateyPackages.ps1;
+# ~ 1.8GB --> 1.31GB
+RUN .\Installers\Install-ChocolateyPackages.ps1; `
+     Invoke-Cleanup;
 
 COPY scripts/Installers/Install-JavaTools.ps1 ./Installers/
 COPY scripts/Tests/Java.Tests.ps1 ./Tests/
-# ~ 1.9GB
-RUN .\Installers\Install-JavaTools.ps1;
+# ~ 1.9GB --> 1.29GB
+RUN .\Installers\Install-JavaTools.ps1; `
+     Invoke-Cleanup;
 # Kotlin is installed in the previous layer with other tools related to Tools.Tests.ps1
 
 COPY scripts/Installers/Install-OpenSSL.ps1 ./Installers/
 #COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
-# ~ 684MB
-RUN .\Installers\Install-OpenSSL.ps1;
+# ~ 684MB --> 533MB
+RUN .\Installers\Install-OpenSSL.ps1; `
+     Invoke-Cleanup;
 
 
 #   provisioner "powershell" {
@@ -272,50 +285,58 @@ RUN .\Installers\Install-OpenSSL.ps1;
 #   }
 
 COPY scripts/Installers/Install-PyPy.ps1 ./Installers/
-# ~ 372MB
-RUN .\Installers\Install-PyPy.ps1;
+# ~ 372MB --> 170MB
+RUN .\Installers\Install-PyPy.ps1; `
+     Invoke-Cleanup;
 
 COPY scripts/Installers/Install-Ruby.ps1 ./Installers/
-# ~ 217MB
-RUN .\Installers\Install-Ruby.ps1;
+# ~ 217MB 129MB
+RUN .\Installers\Install-Ruby.ps1; `
+     Invoke-Cleanup;
 
 COPY scripts/Installers/Install-Toolset.ps1 scripts/Installers/Configure-Toolset.ps1 ./Installers/
 COPY scripts/Tests/Toolset.Tests.ps1 ./Tests/
-# ~ 5.8GB
+# ~ 5.8GB --> 2.17GB
 RUN .\Installers\Install-Toolset.ps1; `
-     .\Installers\Configure-Toolset.ps1;
+     .\Installers\Configure-Toolset.ps1; `
+     Invoke-Cleanup;
 
 # Note: Node installation is moved to the next layer due to the extended time it takes to install and configure
 
-COPY scripts/Installers/Install-PowershellAzModules.ps1 ./Installers/
-COPY scripts/Tests/PowershellAzModules.Tests.ps1 ./Tests/
-# ~ 2.26GB
-RUN .\Installers\Install-PowershellAzModules.ps1;
+# COPY scripts/Installers/Install-PowershellAzModules.ps1 ./Installers/
+# COPY scripts/Tests/PowershellAzModules.Tests.ps1 ./Tests/
+# # ~ 2.26GB
+# RUN .\Installers\Install-PowershellAzModules.ps1;
 
 COPY scripts/Installers/Install-Git.ps1 ./Installers/
 COPY scripts/Tests/Git.Tests.ps1 ./Tests/
-# ~ 466MB
-RUN .\Installers\Install-Git.ps1;
+# ~ 466MB --> 400MB
+RUN .\Installers\Install-Git.ps1; `
+     Invoke-Cleanup;
 # GitHub CLI is installed in the previous layer with other CLI tools
 
 COPY scripts/Installers/Install-DotnetSDK.ps1 ./Installers/
 COPY scripts/Tests/DotnetSDK.Tests.ps1 ./Tests/
-# ~ 6.33GB
-RUN .\Installers\Install-DotnetSDK.ps1;
+# ~ 6.33GB --> 781MB
+RUN .\Installers\Install-DotnetSDK.ps1; `
+     Invoke-Cleanup;
 
 COPY scripts/Installers/Install-Miniconda.ps1 ./Installers/
 COPY scripts/Tests/Miniconda.Tests.ps1 ./Tests/
-# ~ 794MB
-RUN .\Installers\Install-Miniconda.ps1;
+# ~ 794MB --> 703MB
+RUN .\Installers\Install-Miniconda.ps1; `
+     Invoke-Cleanup;
 
 COPY scripts/Installers/Install-Vcpkg.ps1 ./Installers/
 #COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
-# ~ 179MB
-RUN .\Installers\Install-Vcpkg.ps1;
+# ~ 179MB --> 164MB
+RUN .\Installers\Install-Vcpkg.ps1; `
+     Invoke-Cleanup;
 
 COPY scripts/Installers/Install-RootCA.ps1 ./Installers/
-# ~ 39MB
-RUN .\Installers\Install-RootCA.ps1;
+# ~ 39MB --> 32MB
+RUN .\Installers\Install-RootCA.ps1; `
+     Invoke-Cleanup;
 
 
 FROM layer2 AS layer3
@@ -326,8 +347,9 @@ ARG npmApiKey
 
 COPY scripts/Installers/Install-NodeJS.ps1 ./Installers/
 COPY scripts/Tests/Node.Tests.ps1 ./Tests/
-# ~ 286MB
-RUN .\Installers\Install-NodeJS.ps1;
+# ~ 286MB --> 202MB
+RUN .\Installers\Install-NodeJS.ps1; `
+     Invoke-Cleanup;
 
 # "global_packages": [
 #     { "name": "yarn", "test": "yarn --version" },
@@ -337,7 +359,7 @@ RUN .\Installers\Install-NodeJS.ps1;
 #     { "name": "grunt-cli", "test": "grunt --version" }
 # ]
 
-# ~ 511MB
+# ~ 511MB --> 372MB
 #configure npm and install npm packages
 RUN npm install -g `
         cordova `
@@ -353,7 +375,9 @@ RUN npm install -g `
         # playwright `
         typescript `
         # yarn `
-        azurite;
+        azurite; `
+     npm cache clean --force; `
+     Invoke-Cleanup;
     #npm install -g --save-dev webpack webpack-cli
 
         # "common_packages": [

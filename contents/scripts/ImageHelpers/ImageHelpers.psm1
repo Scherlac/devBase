@@ -34,6 +34,7 @@ Export-ModuleMember -Function @(
     'Test-FileChecksum'
     'Test-FileSignature'
     'Update-Environment'
+    'Invoke-Cleanup'
 )
 
 . $PSScriptRoot\PathHelpers.ps1
