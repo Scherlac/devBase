@@ -58,10 +58,12 @@ COPY toolsets ./toolsets/
 
 COPY scripts/Installers/Configure-PowerShell.ps1 scripts/Installers/Install-PowerShellModules.ps1 ./Installers/
 COPY scripts/Tests/PowerShellModules.Tests.ps1 ./Tests/
+# ~ 570MB
 RUN  `
      .\Installers\Configure-PowerShell.ps1; `
      .\Installers\Install-PowerShellModules.ps1;
 
+# ~ 55MB
 COPY scripts/Installers/Install-Chocolatey.ps1 ./Installers/
 RUN .\Installers\Install-Chocolatey.ps1;
 
@@ -77,7 +79,7 @@ RUN .\Installers\Install-Chocolatey.ps1;
 # COPY scripts/Installers/Configure-SystemEnvironment.ps1 ./Installers/
 # RUN      .\Installers\Configure-SystemEnvironment.ps1;
 
-
+# ~ 17MB
 COPY scripts/Installers/Configure-DotnetSecureChannel.ps1 ./Installers/
 RUN .\Installers\Configure-DotnetSecureChannel.ps1;
 
@@ -104,6 +106,7 @@ RUN .\Installers\Configure-DotnetSecureChannel.ps1;
 
 # Moved to later sectio to have all Tools related test subject at similar location
 
+# ~ 115MB
 COPY scripts/Installers/Install-Runner.ps1 ./Installers/
 COPY scripts/Tests/RunnerCache.Tests.ps1 ./Tests/
 RUN .\Installers\Install-Runner.ps1;
@@ -129,6 +132,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 COPY scripts/Tests/VisualStudio.Tests.ps1 ./Tests/
 
 COPY scripts/Installers/Install-VisualStudio.ps1 ./Installers/
+# ~ 24.7GB
 RUN .\Installers\Install-VisualStudio.ps1;
 
 # COPY scripts/Installers/Install-VS.ps1 ./Installers/
@@ -137,9 +141,11 @@ RUN .\Installers\Install-VisualStudio.ps1;
 
 COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
 
+# ~ 561MB
 COPY scripts/Installers/Install-PowershellCore.ps1 ./Installers/
 RUN .\Installers\Install-PowershellCore.ps1;
 
+# ~ 68MB
 COPY scripts/Installers/Install-WebPlatformInstaller.ps1 ./Installers/
 RUN .\Installers\Install-WebPlatformInstaller.ps1;
 
@@ -167,13 +173,15 @@ RUN .\Installers\Install-WebPlatformInstaller.ps1;
 
 COPY scripts/Installers/Install-Wix.ps1 scripts/Installers/Install-WDK.ps1 scripts/Installers/Install-VSExtensions.ps1 ./Installers/
 COPY scripts/Tests/Wix.Tests.ps1 scripts/Tests/WDK.Tests.ps1 scripts/Tests/Vsix.Tests.ps1 ./Tests/
+# ~ 5.7GB
 RUN .\Installers\Install-Wix.ps1; `
-     .\Installers\Install-WDK.ps1; `
+     # .\Installers\Install-WDK.ps1; `
      .\Installers\Install-VSExtensions.ps1;
 
 COPY scripts/Tests/CLI.Tools.Tests.ps1 ./Tests/
 
 COPY scripts/Installers/Install-AzureCli.ps1 scripts/Installers/Install-AzureDevOpsCli.ps1 ./Installers/
+# ~ 526MB
 RUN .\Installers\Install-AzureCli.ps1; `
      .\Installers\Install-AzureDevOpsCli.ps1;
 
@@ -183,19 +191,23 @@ RUN .\Installers\Install-AzureCli.ps1; `
 #      .\Installers\Install-CloudFoundryCli.ps1;
 
 COPY scripts/Installers/Install-GitHub-CLI.ps1 ./Installers/
+# ~ 132MB
 RUN .\Installers\Install-GitHub-CLI.ps1;
 
 COPY scripts/Installers/Install-ChocolateyPackages.ps1 ./Installers/
 COPY scripts/Tests/ChocoPackages.Tests.ps1 ./Tests/
+# ~ 1.8GB
 RUN .\Installers\Install-ChocolateyPackages.ps1;
 
 COPY scripts/Installers/Install-JavaTools.ps1 ./Installers/
 COPY scripts/Tests/Java.Tests.ps1 ./Tests/
+# ~ 1.9GB
 RUN .\Installers\Install-JavaTools.ps1;
 # Kotlin is installed in the previous layer with other tools related to Tools.Tests.ps1
 
 COPY scripts/Installers/Install-OpenSSL.ps1 ./Installers/
 #COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
+# ~ 684MB
 RUN .\Installers\Install-OpenSSL.ps1;
 
 
@@ -260,13 +272,16 @@ RUN .\Installers\Install-OpenSSL.ps1;
 #   }
 
 COPY scripts/Installers/Install-PyPy.ps1 ./Installers/
+# ~ 372MB
 RUN .\Installers\Install-PyPy.ps1;
 
 COPY scripts/Installers/Install-Ruby.ps1 ./Installers/
+# ~ 217MB
 RUN .\Installers\Install-Ruby.ps1;
 
 COPY scripts/Installers/Install-Toolset.ps1 scripts/Installers/Configure-Toolset.ps1 ./Installers/
 COPY scripts/Tests/Toolset.Tests.ps1 ./Tests/
+# ~ 5.8GB
 RUN .\Installers\Install-Toolset.ps1; `
      .\Installers\Configure-Toolset.ps1;
 
@@ -274,26 +289,32 @@ RUN .\Installers\Install-Toolset.ps1; `
 
 COPY scripts/Installers/Install-PowershellAzModules.ps1 ./Installers/
 COPY scripts/Tests/PowershellAzModules.Tests.ps1 ./Tests/
+# ~ 2.26GB
 RUN .\Installers\Install-PowershellAzModules.ps1;
 
 COPY scripts/Installers/Install-Git.ps1 ./Installers/
 COPY scripts/Tests/Git.Tests.ps1 ./Tests/
+# ~ 466MB
 RUN .\Installers\Install-Git.ps1;
 # GitHub CLI is installed in the previous layer with other CLI tools
 
 COPY scripts/Installers/Install-DotnetSDK.ps1 ./Installers/
 COPY scripts/Tests/DotnetSDK.Tests.ps1 ./Tests/
+# ~ 6.33GB
 RUN .\Installers\Install-DotnetSDK.ps1;
 
 COPY scripts/Installers/Install-Miniconda.ps1 ./Installers/
 COPY scripts/Tests/Miniconda.Tests.ps1 ./Tests/
+# ~ 794MB
 RUN .\Installers\Install-Miniconda.ps1;
 
 COPY scripts/Installers/Install-Vcpkg.ps1 ./Installers/
 #COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
+# ~ 179MB
 RUN .\Installers\Install-Vcpkg.ps1;
 
 COPY scripts/Installers/Install-RootCA.ps1 ./Installers/
+# ~ 39MB
 RUN .\Installers\Install-RootCA.ps1;
 
 
@@ -305,6 +326,7 @@ ARG npmApiKey
 
 COPY scripts/Installers/Install-NodeJS.ps1 ./Installers/
 COPY scripts/Tests/Node.Tests.ps1 ./Tests/
+# ~ 286MB
 RUN .\Installers\Install-NodeJS.ps1;
 
 # "global_packages": [
@@ -315,6 +337,7 @@ RUN .\Installers\Install-NodeJS.ps1;
 #     { "name": "grunt-cli", "test": "grunt --version" }
 # ]
 
+# ~ 511MB
 #configure npm and install npm packages
 RUN npm install -g `
         cordova `
