@@ -161,8 +161,8 @@
         { "name": "Hyper-V-PowerShell" }
     ],
     "visualStudio": {
-        "version" : "2022",
-        "subversion" : "17",
+        "version" : "2019",
+        "subversion" : "16",
         "edition" : "BuildTools",
         "channel": "release",
         "signature": "72105B6D5F370B62FD5C82F1512F7AD7DEE5F2C0",
@@ -173,7 +173,7 @@
 
 
         ],
-        "allworkloads": [
+        "allworkloads2022": [
             "Microsoft.VisualStudio.Workload.AzureBuildTools",
             "Microsoft.VisualStudio.Workload.DataBuildTools",
             "Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools",

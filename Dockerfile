@@ -3,7 +3,7 @@
 ARG GIT_TOKEN
 # ARG HTTP_PROXY
 # ARG HTTPS_PROXY
-FROM mcr.microsoft.com/windows/servercore:ltsc2022-KB5033118-amd64 AS layer1
+FROM mcr.microsoft.com/windows/servercore/insider:10.0.20348.1 AS layer1
 #FROM mcr.microsoft.com/windows/servercore:10.0.19042.1415 AS layer1
 
 # ENV NO_PROXY="localhost,127.0.0.1"
