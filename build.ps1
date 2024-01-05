@@ -16,7 +16,7 @@ Write-Output "Building the image for repository ${dockerRepository} with tag ${d
 
 $ret = $true
 
-("layer1", "layer2", "layer3" <#, "layer4"#>) | % {
+("layer1", "layer2", "layer3", "layer4", "layer5") | % {
     $layer = $_;
 
     docker build `

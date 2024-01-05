@@ -204,16 +204,17 @@ COPY scripts/Installers/Install-GitHub-CLI.ps1 ./Installers/
 RUN .\Installers\Install-GitHub-CLI.ps1; `
      Invoke-Cleanup;
 
-COPY scripts/Installers/Install-ChocolateyPackages.ps1 ./Installers/
-COPY scripts/Tests/ChocoPackages.Tests.ps1 ./Tests/
-# ~ 1.8GB --> 1.31GB
-RUN .\Installers\Install-ChocolateyPackages.ps1; `
-     Invoke-Cleanup;
+# COPY scripts/Installers/Install-ChocolateyPackages.ps1 ./Installers/
+# COPY scripts/Tests/ChocoPackages.Tests.ps1 ./Tests/
+# # ~ 1.8GB --> 1.31GB --> 3.14GB?? change for unknown reason --> removed.
+# RUN .\Installers\Install-ChocolateyPackages.ps1; `
+#      Invoke-Cleanup;
 
 COPY scripts/Installers/Install-JavaTools.ps1 ./Installers/
 COPY scripts/Tests/Java.Tests.ps1 ./Tests/
-# ~ 1.9GB --> 1.29GB
-RUN .\Installers\Install-JavaTools.ps1; `
+# ~ 1.9GB --> 1.29GB --> 1.16GB
+RUN Install-ChocoPackage 7zip.install; `
+     .\Installers\Install-JavaTools.ps1; `
      Invoke-Cleanup;
 # Kotlin is installed in the previous layer with other tools related to Tools.Tests.ps1
 
@@ -290,13 +291,13 @@ RUN .\Installers\Install-PyPy.ps1; `
      Invoke-Cleanup;
 
 COPY scripts/Installers/Install-Ruby.ps1 ./Installers/
-# ~ 217MB 129MB
+# ~ 217MB --> 129MB --> 77MB
 RUN .\Installers\Install-Ruby.ps1; `
      Invoke-Cleanup;
 
 COPY scripts/Installers/Install-Toolset.ps1 scripts/Installers/Configure-Toolset.ps1 ./Installers/
 COPY scripts/Tests/Toolset.Tests.ps1 ./Tests/
-# ~ 5.8GB --> 2.17GB
+# ~ 5.8GB --> 2.17GB --> 1.12GB
 RUN .\Installers\Install-Toolset.ps1; `
      .\Installers\Configure-Toolset.ps1; `
      Invoke-Cleanup;
@@ -317,7 +318,7 @@ RUN .\Installers\Install-Git.ps1; `
 
 COPY scripts/Installers/Install-DotnetSDK.ps1 ./Installers/
 COPY scripts/Tests/DotnetSDK.Tests.ps1 ./Tests/
-# ~ 6.33GB --> 1.52GB
+# ~ 6.33GB --> 1.52GB --> 854MB
 RUN .\Installers\Install-DotnetSDK.ps1; `
      Invoke-Cleanup;
 
@@ -347,7 +348,7 @@ ARG npmApiKey
 
 COPY scripts/Installers/Install-NodeJS.ps1 ./Installers/
 COPY scripts/Tests/Node.Tests.ps1 ./Tests/
-# ~ 286MB --> 202MB
+# ~ 286MB --> 202MB --> 208MB
 RUN .\Installers\Install-NodeJS.ps1; `
      Invoke-Cleanup;
 
@@ -359,7 +360,7 @@ RUN .\Installers\Install-NodeJS.ps1; `
 #     { "name": "grunt-cli", "test": "grunt --version" }
 # ]
 
-# ~ 511MB --> 365MB
+# ~ 511MB --> 365MB --> 370MB
 #configure npm and install npm packages
 RUN npm install -g `
         cordova `
@@ -413,10 +414,14 @@ RUN npm install -g `
 # RUN      .\Installers\Install-ChocolateyPackages.ps1;
 
 
+FROM layer3 AS layer4
+
+# ~ 255MB
+RUN Install-ChocoPackage cmake.install -ArgumentList @( '--installargs',  'ADD_CMAKE_TO_PATH="System"' ); `
+     Invoke-Cleanup;
 
 
-
-# FROM localhost:5000/windows-servercore-devbase:layer3 AS layer4
+FROM layer4 AS layer5
 
 # ENV PLAYWRIGHT_BROWSERS_PATH="C:\ms-playwright"
 
@@ -425,4 +430,11 @@ RUN npm install -g `
 #     npm init -fy; `
 #     npm install -D playwright@1.14.1; `
 #     rm -Recurse -Force -Path .\node_modules\;
+
+# ~ 40MB
+RUN $env:PIP_CACHE_DIR=$env:TEMP; `
+     pip install `
+          ninja `
+          meson; `
+     Invoke-Cleanup;
 
