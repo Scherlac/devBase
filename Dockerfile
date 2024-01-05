@@ -178,13 +178,13 @@ RUN .\Installers\Install-WebPlatformInstaller.ps1; `
 #   }
 
 
-COPY scripts/Installers/Install-Wix.ps1 scripts/Installers/Install-WDK.ps1 scripts/Installers/Install-VSExtensions.ps1 ./Installers/
-COPY scripts/Tests/Wix.Tests.ps1 scripts/Tests/WDK.Tests.ps1 scripts/Tests/Vsix.Tests.ps1 ./Tests/
-# ~ 5.7GB --> 1.67GB
-RUN .\Installers\Install-Wix.ps1; `
-     # .\Installers\Install-WDK.ps1; `
-     .\Installers\Install-VSExtensions.ps1; `
-     Invoke-Cleanup;
+# COPY scripts/Installers/Install-Wix.ps1 scripts/Installers/Install-WDK.ps1 scripts/Installers/Install-VSExtensions.ps1 ./Installers/
+# COPY scripts/Tests/Wix.Tests.ps1 scripts/Tests/WDK.Tests.ps1 scripts/Tests/Vsix.Tests.ps1 ./Tests/
+# # ~ 5.7GB --> 1.67GB
+# RUN .\Installers\Install-Wix.ps1; `
+#      # .\Installers\Install-WDK.ps1; `
+#      .\Installers\Install-VSExtensions.ps1; `
+#      Invoke-Cleanup;
 
 COPY scripts/Tests/CLI.Tools.Tests.ps1 ./Tests/
 
