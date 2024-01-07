@@ -144,17 +144,17 @@ RUN .\Installers\Install-VisualStudio.ps1; `
 # RUN .\Installers\Install-VS.ps1;
 
 
-COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
+# COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
 
-# ~ 561MB --> 451MB
-COPY scripts/Installers/Install-PowershellCore.ps1 ./Installers/
-RUN .\Installers\Install-PowershellCore.ps1; `
-     Invoke-Cleanup;
+# # ~ 561MB --> 451MB
+# COPY scripts/Installers/Install-PowershellCore.ps1 ./Installers/
+# RUN .\Installers\Install-PowershellCore.ps1; `
+#      Invoke-Cleanup;
 
-# ~ 68MB --> 66MB
-COPY scripts/Installers/Install-WebPlatformInstaller.ps1 ./Installers/
-RUN .\Installers\Install-WebPlatformInstaller.ps1; `
-     Invoke-Cleanup;
+# # ~ 68MB --> 66MB
+# COPY scripts/Installers/Install-WebPlatformInstaller.ps1 ./Installers/
+# RUN .\Installers\Install-WebPlatformInstaller.ps1; `
+#      Invoke-Cleanup;
 
 # COPY scripts/Installers/Install-KubernetesTools.ps1 ./Installers/
 # RUN .\Installers\Install-KubernetesTools.ps1;
@@ -191,7 +191,7 @@ COPY scripts/Tests/CLI.Tools.Tests.ps1 ./Tests/
 COPY scripts/Installers/Install-AzureCli.ps1 scripts/Installers/Install-AzureDevOpsCli.ps1 ./Installers/
 # ~ 526MB --> 455MB
 RUN .\Installers\Install-AzureCli.ps1; `
-     .\Installers\Install-AzureDevOpsCli.ps1; `
+     # .\Installers\Install-AzureDevOpsCli.ps1; `
      Invoke-Cleanup;
 
 # COPY scripts/Installers/Install-AWSTools.ps1 scripts/Installers/Install-AliyunCli.ps1 scripts/Installers/Install-CloudFoundryCli.ps1 ./Installers/
@@ -218,11 +218,11 @@ RUN Install-ChocoPackage 7zip.install; `
      Invoke-Cleanup;
 # Kotlin is installed in the previous layer with other tools related to Tools.Tests.ps1
 
-COPY scripts/Installers/Install-OpenSSL.ps1 ./Installers/
-#COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
-# ~ 684MB --> 533MB
-RUN .\Installers\Install-OpenSSL.ps1; `
-     Invoke-Cleanup;
+# COPY scripts/Installers/Install-OpenSSL.ps1 ./Installers/
+# #COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
+# # ~ 684MB --> 533MB
+# RUN .\Installers\Install-OpenSSL.ps1; `
+#      Invoke-Cleanup;
 
 
 #   provisioner "powershell" {
@@ -329,7 +329,7 @@ RUN .\Installers\Install-Miniconda.ps1; `
      Invoke-Cleanup;
 
 COPY scripts/Installers/Install-Vcpkg.ps1 ./Installers/
-#COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
+COPY scripts/Tests/Tools.Tests.ps1 ./Tests/
 # ~ 179MB --> 164MB
 RUN .\Installers\Install-Vcpkg.ps1; `
      Invoke-Cleanup;

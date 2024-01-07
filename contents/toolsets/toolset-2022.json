@@ -32,6 +32,11 @@
             "arch": "x86",
             "platform" : "win64",
             "versions": [
+            ],
+            "allVersions":
+            [
+                "3.8",
+                "3.9",
                 "3.10"
             ]
         },
@@ -53,14 +58,14 @@
             "arch": "x64",
             "platform" : "win32",
             "versions": [
-                "1.21.*"
+                "1.20.*"
             ],
             "allVersions": [
                 "1.19.*",
                 "1.20.*",
                 "1.21.*"
             ],
-            "default": "1.21.*"
+            "default": "1.20.*"
         }
     ],
     "powershellModules": [
